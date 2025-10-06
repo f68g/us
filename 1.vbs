@@ -1,4 +1,4 @@
-Dim http, url2, tempFolder, zip1, zip2
+Dim http, url2, tempFolder, zip2
 Dim shell, fso, stream, txtPath, scriptName
 
 
